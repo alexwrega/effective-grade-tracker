@@ -17,25 +17,7 @@ The output is a **single self-contained HTML file** with embedded CSS and JS —
 
 ### Authentication
 
-The project uses the `timeback-reporting` MCP tool connected via Claude. Credentials (for direct API access outside MCP, e.g. via Claude Code):
-
-```json
-{
-  "SSO": {
-    "AWS_COGNITO_REGION": "us-east-1",
-    "AWS_COGNITO_APP_CLIENT_ID": "REDACTED",
-    "AWS_COGNITO_ISSUER": "https://cognito-idp.us-east-1.amazonaws.com/REDACTED",
-    "AWS_COGNITO_JWKS_URI": "https://cognito-idp.us-east-1.amazonaws.com/REDACTED/.well-known/jwks.json",
-    "AWS_COGNITO_CLIENT_SECRET": "REDACTED"
-  },
-  "API": {
-    "AWS_COGNITO_APP_CLIENT_ID": "REDACTED",
-    "AWS_COGNITO_CLIENT_SECRET": "REDACTED"
-  }
-}
-```
-
-API documentation (Scalar/OpenAPI): `https://api.alpha-1edtech.ai/scalar` and `https://qti.alpha-1edtech.ai/scalar`
+The project uses the `timeback-reporting` MCP tool connected via Claude. Credentials are stored locally and not committed to version control.
 
 ### Available Database Views
 
