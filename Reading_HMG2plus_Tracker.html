@@ -134,8 +134,12 @@ DATA.students.forEach(s => {
   }
 });
 
-// Recompute active_course using enrollment end dates
+// Recompute working_grade_level and active_course at init
 DATA.students.forEach(s => {
+  // Working level = HMG + 1 (mastered grade N → working on grade N+1)
+  if (s.highest_grade_mastered != null) {
+    s.working_grade_level = s.highest_grade_mastered + 1;
+  }
   const courses = DATA.courseProgress[s.student_id] || [];
   const active = courses.filter(c => isCourseActive(s.student_id, c.course_name, c.is_enrolled));
   if (active.length > 0) {
