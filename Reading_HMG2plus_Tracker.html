@@ -134,12 +134,24 @@ DATA.students.forEach(s => {
   }
 });
 
+// Early literacy: HMG=2 student who has not begun any grade-3 Reading course
+const GRADE3_COURSES = ['Reading Primer Grade 3', 'Alpha Read - Grade 3',
+  'MobyMax - Reading Skills Informational 3', 'MobyMax - Reading Skills Literature 3'];
+function isEarlyLiteracy(s) {
+  if (s.highest_grade_mastered !== 2) return false;
+  const courses = DATA.courseProgress[s.student_id] || [];
+  return !courses.some(c => GRADE3_COURSES.includes(c.course_name) && c.course_earned_xp > 0);
+}
+function isNotEarlyLiteracy(s) { return !isEarlyLiteracy(s); }
+
 // Recompute working_grade_level and active_course at init
 DATA.students.forEach(s => {
   // Working level = HMG + 1 (mastered grade N → working on grade N+1)
   if (s.highest_grade_mastered != null) {
     s.working_grade_level = s.highest_grade_mastered + 1;
   }
+  // Early literacy flag
+  s.isEarlyLit = isEarlyLiteracy(s);
   const courses = DATA.courseProgress[s.student_id] || [];
   const active = courses.filter(c => isCourseActive(s.student_id, c.course_name, c.is_enrolled));
   if (active.length > 0) {
@@ -261,12 +273,6 @@ function isCourseActive(studentId, courseName, isEnrolled) {
   const today = new Date();
   today.setHours(0,0,0,0);
   return endDate >= today;
-}
-
-// Early literacy check: student must have at least one grade 3+ Reading course assigned
-function isNotEarlyLiteracy(s) {
-  const courses = DATA.courseProgress[s.student_id] || [];
-  return courses.some(c => c.grade_level != null && c.grade_level >= 3);
 }
 
 // Filtering & grouping — uses grades_ahead_new (effective grade based)
@@ -401,7 +407,7 @@ function renderSection(containerId, students, sectionKey, opts) {
 
     html += `<tr class="${rowBg} hover:bg-blue-50 cursor-pointer transition-colors" onclick="toggleStudent('${s.student_id}')">
       <td class="px-3 py-2 text-gray-400">${chevron}</td>
-      <td class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">${s.name}</td>
+      <td class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">${s.name}${s.isEarlyLit ? ' <span class="inline-block px-1.5 py-0.5 text-xs rounded-full bg-rose-200 text-rose-700 font-normal ml-1.5">Early Lit</span>' : ''}</td>
       <td class="px-3 py-2 text-gray-600">${s.campus}</td>
       <td class="px-3 py-2">${s.age_grade_level}</td>
       <td class="px-3 py-2 font-semibold">${s.highest_grade_mastered}</td>
