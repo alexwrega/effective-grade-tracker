@@ -140,7 +140,12 @@ const GRADE3_COURSES = ['Reading Primer Grade 3', 'Alpha Read - Grade 3',
 function isEarlyLiteracy(s) {
   if (s.highest_grade_mastered !== 2) return false;
   const courses = DATA.courseProgress[s.student_id] || [];
-  return !courses.some(c => GRADE3_COURSES.includes(c.course_name) && c.course_earned_xp > 0);
+  // Not early lit if they've begun a grade-3 base course
+  if (courses.some(c => GRADE3_COURSES.includes(c.course_name) && c.course_earned_xp > 0)) return false;
+  // Not early lit if they've done any grade 3+ hole-filling
+  if (courses.some(c => c.grade_level >= 3 && c.course_earned_xp > 0 &&
+    (c.course_type === 'hole-filling' || c.course_name.toLowerCase().includes('hole-filling')))) return false;
+  return true;
 }
 function isNotEarlyLiteracy(s) { return !isEarlyLiteracy(s); }
 
@@ -407,7 +412,7 @@ function renderSection(containerId, students, sectionKey, opts) {
 
     html += `<tr class="${rowBg} hover:bg-blue-50 cursor-pointer transition-colors" onclick="toggleStudent('${s.student_id}')">
       <td class="px-3 py-2 text-gray-400">${chevron}</td>
-      <td class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">${s.name}${s.isEarlyLit ? ' <span class="inline-block px-1.5 py-0.5 text-xs rounded-full bg-rose-200 text-rose-700 font-normal ml-1.5">Early Lit</span>' : ''}</td>
+      <td class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">${s.name}${s.isEarlyLit ? ' <span class="inline-block px-1.5 py-0.5 text-xs rounded-full bg-green-200 text-green-700 font-normal ml-1.5">Early Lit</span>' : ''}</td>
       <td class="px-3 py-2 text-gray-600">${s.campus}</td>
       <td class="px-3 py-2">${s.age_grade_level}</td>
       <td class="px-3 py-2 font-semibold">${s.highest_grade_mastered}</td>
